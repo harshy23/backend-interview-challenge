@@ -11,8 +11,9 @@ describe('Integration Tests', () => {
   beforeEach(async () => {
     db = new Database(':memory:');
     await db.initialize();
-    taskService = new TaskService(db);
-    syncService = new SyncService(db, taskService);
+    taskService = new TaskService(db);               // 1. Create TaskService
+    syncService = new SyncService(db, taskService);  // 2. Create SyncService
+    taskService.syncService = syncService;           // 3. Back-link!
   });
 
   afterEach(async () => {
@@ -49,7 +50,7 @@ describe('Integration Tests', () => {
       const isOnline = await syncService.checkConnectivity();
       if (isOnline) {
         const syncResult = await syncService.sync();
-        
+
         // Verify sync results
         expect(syncResult).toBeDefined();
         expect(syncResult.success).toBeDefined();
